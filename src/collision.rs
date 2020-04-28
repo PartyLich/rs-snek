@@ -1,11 +1,10 @@
 /// Provides collision detection functions
 use crate::{
     snake::Snake,
-    types::{Cell, Direction, Grid, SnakeEvent, FOOD_COLOR, SNAKE_COLOR},
+    types::{Cell, Direction, SnakeEvent, FOOD_COLOR, SNAKE_COLOR},
 };
 
 /// Check for collisions in the player's *next* position and return appropriate `SnakeEvent`
-// pub fn collision_check(grid: &Grid, player: &Snake, direction: &Direction) -> Option<SnakeEvent> {
 pub fn collision_check(
     grid: &[Vec<Cell>],
     player: &Snake,

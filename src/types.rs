@@ -1,6 +1,6 @@
 use sdl2::pixels::Color;
 
-pub const GAME_NAME: &'static str = "rs-snek";
+pub const GAME_NAME: &str = "rs-snek";
 
 /// A single square on the game board
 pub type Cell = Color;
