@@ -38,17 +38,23 @@ impl Snake {
     pub fn next_position(&self, direction: &Direction, height: u32, width: u32) -> Position {
         let (dy, dx) = direction.value();
         let (row, col) = *self.position();
+        let mut row = dy + row as i32;
+        let mut col = dx + col as i32;
 
         // boundary checks
-        let row: u32 = wrap_index(0, height as i32, dy + row as i32)
-            .try_into()
-            .unwrap();
-        let col = wrap_index(0, width as i32, dx + col as i32) as u32;
+        if let Some(y) = wrap_index(0, height, row) {
+            row = y;
+        }
+        if let Some(x) = wrap_index(0, width, col) {
+            col = x;
+        }
 
         // dont let snake turn back on itself
         match self.body.get(1) {
-            Some(x) if *x == (row, col) => self.next_position(&direction.flip(), height, width),
-            _ => (row, col),
+            Some(x) if *x == (row as u32, col as u32) => {
+                self.next_position(&direction.flip(), height, width)
+            }
+            _ => (row as u32, col as u32),
         }
     }
 
@@ -89,11 +95,11 @@ impl Snake {
 }
 
 /// wrap an index within `lower` (inclusive) and `upper` (exclusive) bounds
-fn wrap_index(lower: i32, upper: i32, i: i32) -> i32 {
-    match Some(i) {
-        Some(i) if i < lower => upper - 1,
-        Some(i) if i >= upper => lower,
-        _ => i,
+fn wrap_index(lower: i32, upper: i32, i: i32) -> Option<i32> {
+    match i {
+        i if i < lower => Some(upper - 1),
+        i if i >= upper => Some(lower),
+        _ => None,
     }
 }
 
@@ -132,14 +138,14 @@ mod tests {
 
     #[test]
     fn wraps_index_upper() {
-        let expected = 0;
-        let actual = wrap_index(expected, 10, 11);
+        let expected = Some(0);
+        let actual = wrap_index(expected.unwrap(), 10, 11);
         assert_eq!(actual, expected);
     }
 
     #[test]
     fn wraps_index_lower() {
-        let expected = 9;
+        let expected = Some(9);
         let actual = wrap_index(0, 10, -5);
         assert_eq!(actual, expected);
     }
