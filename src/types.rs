@@ -49,7 +49,9 @@ impl Direction {
 /// Events that may affect the player
 #[derive(Debug, PartialEq)]
 pub enum SnakeEvent {
+    /// Player target acquisition event
     Food,
+    /// Player death event
     Death,
     /// Player input/control event
     Input(Direction),
