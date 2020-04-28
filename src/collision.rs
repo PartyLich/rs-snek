@@ -10,7 +10,7 @@ pub fn collision_check(
     player: &Snake,
     direction: &Direction,
 ) -> Option<SnakeEvent> {
-    let (row, col) = player.next_position(direction, grid.len() as u32, grid[0].len() as u32);
+    let (row, col) = player.next_position(direction, grid.len() as i32, grid[0].len() as i32);
 
     match grid[row as usize][col as usize] {
         _x if _x == SNAKE_COLOR => Some(SnakeEvent::Death),

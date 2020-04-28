@@ -35,7 +35,7 @@ impl Snake {
     }
 
     /// Calculates a new position with direction values and the position from `Snake`
-    pub fn next_position(&self, direction: &Direction, height: u32, width: u32) -> Position {
+    pub fn next_position(&self, direction: &Direction, height: i32, width: i32) -> Position {
         let (dy, dx) = direction.value();
         let (row, col) = *self.position();
         let mut row = dy + row as i32;
@@ -59,7 +59,7 @@ impl Snake {
     }
 
     /// Update the position of this `Snake`
-    pub fn update_position(&mut self, direction: &Direction, width: u32, height: u32) -> &Self {
+    pub fn update_position(&mut self, direction: &Direction, width: i32, height: i32) -> &Self {
         let position = self.next_position(direction, height, width);
 
         self.body.pop_back();
@@ -69,7 +69,7 @@ impl Snake {
     }
 
     /// Update the position of this `Snake` while extending its length
-    pub fn grow(&mut self, direction: &Direction, width: u32, height: u32) -> &Self {
+    pub fn grow(&mut self, direction: &Direction, width: i32, height: i32) -> &Self {
         let position = self.next_position(direction, width, height);
         self.body.push_front(position);
 

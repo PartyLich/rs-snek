@@ -62,11 +62,12 @@ impl Gamestate {
             Some(SnakeEvent::Food) => {
                 println!("event: {:?}", evt);
                 self.score += 1;
-                self.player.grow(&self.direction, cols, rows);
+                self.player.grow(&self.direction, cols as i32, rows as i32);
                 self.fresh_food();
             }
             None => {
-                self.player.update_position(&self.direction, cols, rows);
+                self.player
+                    .update_position(&self.direction, cols as i32, rows as i32);
             }
             _ => (),
         }
