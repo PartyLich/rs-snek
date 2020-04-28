@@ -2,7 +2,7 @@ use rand::Rng;
 
 use crate::{
     snake::Snake,
-    types::{self, Direction, Food, Grid, FOOD_COLOR, SNAKE_COLOR},
+    types::{self, Direction, Food, Grid, SnakeEvent, FOOD_COLOR, SNAKE_COLOR},
 };
 
 /// The state of the gameworld
@@ -36,6 +36,7 @@ impl Gamestate {
         }
     }
 
+    /// Create a new target object at a random location
     pub fn fresh_food(&mut self) {
         let mut row = rand::thread_rng().gen_range(0, self.grid.len());
         let mut col = rand::thread_rng().gen_range(0, self.grid[0].len());
@@ -46,6 +47,28 @@ impl Gamestate {
         }
 
         self.food = Food::new(row as u32, col as u32, Some(FOOD_COLOR));
+    }
+
+    /// Transition game state due to  player collision events
+    pub fn handle_collision(&mut self, evt: Option<SnakeEvent>) {
+        let (rows, cols) = self.world_size;
+        match evt {
+            Some(evt @ SnakeEvent::Death) => {
+                println!("event: {:?}", evt);
+                // game over. restart
+                println!("\n\tGAME OVER. restarting\n");
+                *self = Gamestate::new(cols, rows);
+            }
+            Some(SnakeEvent::Food) => {
+                println!("event: {:?}", evt);
+                self.score += 1;
+                self.player.grow(&self.direction, cols, rows);
+                self.fresh_food();
+            }
+            None => {
+                self.player.update_position(&self.direction, cols, rows);
+            }
+        }
     }
 }
 
