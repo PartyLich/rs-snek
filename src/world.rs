@@ -68,6 +68,14 @@ impl Gamestate {
             None => {
                 self.player.update_position(&self.direction, cols, rows);
             }
+            _ => (),
+        }
+    }
+
+    /// Change player movement direction according to input event
+    pub fn handle_input(&mut self, input: Option<types::SnakeEvent>) {
+        if let Some(SnakeEvent::Input(d)) = input {
+            self.direction = d;
         }
     }
 }

@@ -51,6 +51,8 @@ impl Direction {
 pub enum SnakeEvent {
     Food,
     Death,
+    /// Player input/control event
+    Input(Direction),
 }
 
 #[cfg(test)]

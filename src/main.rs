@@ -34,7 +34,7 @@ fn main() {
                 // movement keys
                 Event::KeyDown {
                     keycode: Some(k), ..
-                } => set_direction(&mut game_state, k),
+                } => game_state.handle_input(map_key_input(k)),
 
                 _ => continue 'game,
             }
@@ -61,13 +61,13 @@ fn main() {
 }
 
 /// Maps keycodes to player movement direction
-// TODO: move some version of this into the gamestate impl. use domain events not tied to keycode
-fn set_direction(game_state: &mut Gamestate, keycode: Keycode) {
+// TODO: maybe just use an actual Map?
+fn map_key_input(keycode: Keycode) -> Option<SnakeEvent> {
     match keycode {
-        Keycode::Up | Keycode::W => game_state.direction = Direction::Up,
-        Keycode::Left | Keycode::A => game_state.direction = Direction::Left,
-        Keycode::Right | Keycode::D => game_state.direction = Direction::Right,
-        Keycode::Down | Keycode::S => game_state.direction = Direction::Down,
-        _ => (),
+        Keycode::Up | Keycode::W => Some(SnakeEvent::Input(Direction::Up)),
+        Keycode::Left | Keycode::A => Some(SnakeEvent::Input(Direction::Left)),
+        Keycode::Right | Keycode::D => Some(SnakeEvent::Input(Direction::Right)),
+        Keycode::Down | Keycode::S => Some(SnakeEvent::Input(Direction::Down)),
+        _ => None,
     }
 }
