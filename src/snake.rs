@@ -124,6 +124,13 @@ mod tests {
     }
 
     #[test]
+    fn snake_position() {
+        let expected = (10, 20);
+        let actual = *Snake::new(10, 20, None).position();
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
     fn wraps_index_upper() {
         let expected = 0;
         let actual = wrap_index(expected, 10, 11);

@@ -16,7 +16,7 @@ pub const SNAKE_COLOR: Cell = Cell::RGB(141, 141, 139);
 pub const BG_COLOR: Cell = Cell::RGB(42, 42, 42);
 
 /// Valid directions of travel
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Direction {
     Left,
     Right,
@@ -51,4 +51,17 @@ impl Direction {
 pub enum SnakeEvent {
     Food,
     Death,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn direction_flip() {
+        assert_eq!(Direction::Down.flip(), Direction::Up);
+        assert_eq!(Direction::Up.flip(), Direction::Down);
+        assert_eq!(Direction::Right.flip(), Direction::Left);
+        assert_eq!(Direction::Left.flip(), Direction::Right);
+    }
 }
