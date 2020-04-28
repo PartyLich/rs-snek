@@ -1,6 +1,6 @@
-use std::{collections::VecDeque, convert::TryInto};
+use std::collections::VecDeque;
 
-use crate::types::{Cell, Direction, Grid, SnakeEvent, SNAKE_COLOR};
+use crate::types::{Cell, Direction, Grid, SNAKE_COLOR};
 
 pub type Position = (u32, u32);
 
@@ -83,14 +83,6 @@ impl Snake {
         }
 
         grid
-    }
-
-    ///
-    pub fn handle(&self, evt: SnakeEvent) {
-        match evt {
-            // SnakeEvent::Food => self.grow(direction: &Direction, width: u32, height: u32)
-            _ => {}
-        }
     }
 }
 
