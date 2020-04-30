@@ -1,6 +1,9 @@
 use sdl2::{rect::Rect, render::Canvas, ttf, video::Window, EventPump};
 
-use crate::types::{self, Cell, Grid};
+use crate::{
+    menu,
+    types::{self, Cell, Grid},
+};
 
 /// Initialize the canvas
 pub fn init(width: u32, height: u32) -> (Canvas<Window>, EventPump) {
@@ -66,15 +69,18 @@ pub fn display_frame(renderer: &mut Canvas<Window>) {
     renderer.present();
 }
 
+/// Initialize a TrueType Font
 // lifetime specifiers from https://users.rust-lang.org/t/rust-sdl2-does-not-live-long-enought-fighting-the-borrow-checher/9464/8
 pub fn init_font<'a, 'b>(
     ttf_context: &'a ttf::Sdl2TtfContext,
     path: &'static str,
+    size: u16,
 ) -> ttf::Font<'a, 'b> {
-    let font = ttf_context.load_font(path, types::FONT_SIZE_SM).unwrap();
+    let font = ttf_context.load_font(path, size).unwrap();
     font
 }
 
+/// Display a text `&str` at the top center of the window
 pub fn render_text(font: &ttf::Font, renderer: &mut Canvas<Window>, text: &str) {
     let surface = font.render(text).blended(types::TEXT_COLOR).unwrap();
     let width = surface.width();
@@ -96,5 +102,51 @@ pub fn render_text(font: &ttf::Font, renderer: &mut Canvas<Window>, text: &str) 
             None,
             Rect::from_center(text_center, width, height),
         )
+        .unwrap();
+}
+
+/// Render a `Menu`
+pub fn render_menu(renderer: &mut Canvas<Window>, font: &ttf::Font, menu: &menu::Menu) {
+    clear_frame(renderer);
+
+    // render each menu item
+    let (mut x, mut y) = renderer.window().size();
+    x /= 2;
+    y /= 4;
+    let vertical_step = font.height() as u32;
+
+    for (i, item) in menu.menu_items.iter().enumerate() {
+        let selected = i == menu.selection();
+        render_menu_item(renderer, font, item, selected, x as i32, y as i32);
+        y += vertical_step;
+    }
+}
+
+/// Render a `MenuItem`
+pub fn render_menu_item(
+    renderer: &mut Canvas<Window>,
+    font: &ttf::Font,
+    item: &menu::MenuItem,
+    selected: bool,
+    x: i32,
+    y: i32,
+) {
+    let (color, text) = if selected {
+        (types::TEXT_SELECTED, format!("> {}", item.label))
+    } else {
+        (types::TEXT_COLOR, item.label.to_string())
+    };
+
+    let surface = font.render(&text).solid(color).unwrap();
+    let width = surface.width();
+    let height = surface.height();
+
+    let texture_creator = renderer.texture_creator();
+    let texture = texture_creator
+        .create_texture_from_surface(surface)
+        .unwrap();
+
+    renderer
+        .copy(&texture, None, Rect::from_center((x, y), width, height))
         .unwrap();
 }
