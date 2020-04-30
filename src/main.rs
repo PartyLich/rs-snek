@@ -25,7 +25,7 @@ fn main() {
     let game_font = gfx::init_font(&ttf_context, types::FONT_PATH, types::FONT_SIZE_SM);
 
     'menu: loop {
-        match menu::menu(&mut canvas, &mut event_pump, &menu_font) {
+        match menu::main_menu(&mut canvas, &mut event_pump, &menu_font) {
             MenuEvent::Start(game_mode) => run_game(
                 &mut canvas,
                 &mut event_pump,
