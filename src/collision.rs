@@ -28,7 +28,7 @@ mod tests {
     fn collision_food() {
         let grid = vec![vec![Cell::RGB(0, 0, 0), FOOD_COLOR]];
         let expected = Some(SnakeEvent::Food);
-        let actual = collision_check(&grid, &Snake::new(0, 0, None), &Direction::Right);
+        let actual = collision_check(&grid, &Snake::new(0, 0, None, None), &Direction::Right);
         assert_eq!(actual, expected);
     }
 
@@ -36,7 +36,7 @@ mod tests {
     fn collision_death() {
         let grid = vec![vec![Cell::RGB(0, 0, 0), SNAKE_COLOR]];
         let expected = Some(SnakeEvent::Death);
-        let actual = collision_check(&grid, &Snake::new(0, 0, None), &Direction::Left);
+        let actual = collision_check(&grid, &Snake::new(0, 0, None, None), &Direction::Left);
         assert_eq!(actual, expected);
     }
 
@@ -44,7 +44,7 @@ mod tests {
     fn collision_none() {
         let grid = vec![vec![types::BG_COLOR, types::BG_COLOR]];
         let expected = None;
-        let actual = collision_check(&grid, &Snake::new(0, 0, None), &Direction::Left);
+        let actual = collision_check(&grid, &Snake::new(0, 0, None, None), &Direction::Left);
         assert_eq!(actual, expected);
     }
 }

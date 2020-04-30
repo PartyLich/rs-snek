@@ -2,7 +2,7 @@ use rand::Rng;
 
 use crate::{
     snake::Snake,
-    types::{self, Direction, Food, Grid, SnakeEvent, FOOD_COLOR, SNAKE_COLOR},
+    types::{self, Direction, Food, GameMode, Grid, SnakeEvent, FOOD_COLOR, SNAKE_COLOR},
 };
 
 /// The state of the gameworld
@@ -25,12 +25,12 @@ pub struct Gamestate {
 }
 
 impl Gamestate {
-    pub fn new(rows: u32, cols: u32) -> Self {
+    pub fn new(rows: u32, cols: u32, mode: GameMode) -> Self {
         Gamestate {
             grid: grid_init(cols, rows),
             direction: Direction::Down,
-            player: Snake::new(0, 0, None),
-            food: Food::new(rows / 2, cols / 2, Some(FOOD_COLOR)),
+            player: Snake::new(0, 0, None, Some(mode)),
+            food: Food::new(rows / 2, cols / 2, Some(FOOD_COLOR), None),
             world_size: (rows, cols),
             score: 0,
         }
@@ -46,7 +46,7 @@ impl Gamestate {
             col = rand::thread_rng().gen_range(0, self.grid[0].len());
         }
 
-        self.food = Food::new(row as u32, col as u32, Some(FOOD_COLOR));
+        self.food = Food::new(row as u32, col as u32, Some(FOOD_COLOR), None);
     }
 
     /// Transition game state due to  player collision events
@@ -57,7 +57,6 @@ impl Gamestate {
                 println!("event: {:?}", evt);
                 // game over. restart
                 println!("\n\tGAME OVER. restarting\n");
-                *self = Gamestate::new(cols, rows);
             }
             Some(SnakeEvent::Food) => {
                 println!("event: {:?}", evt);
