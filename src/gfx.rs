@@ -38,14 +38,14 @@ pub fn display_cell(
     renderer: &mut Canvas<Window>,
     row: u32,
     col: u32,
-    cell: &Cell,
+    cell: Cell,
     cell_width: u32,
 ) {
     let cell_height = cell_width; // All cells are square
     let x = cell_width * col;
     let y = cell_width * row;
 
-    renderer.set_draw_color(*cell);
+    renderer.set_draw_color(cell);
     if let Err(e) = renderer.fill_rect(Rect::new(x as i32, y as i32, cell_width, cell_height)) {
         println!("{}", e)
     }
@@ -58,7 +58,7 @@ pub fn render_frame(renderer: &mut Canvas<Window>, grid: &[Vec<Cell>], cell_widt
 
     for row in 0..grid.len() as u32 {
         for col in 0..grid[0].len() as u32 {
-            let cell = &grid[row as usize][col as usize];
+            let cell = grid[row as usize][col as usize];
             display_cell(renderer, row, col, cell, cell_width);
         }
     }
