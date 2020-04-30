@@ -1,10 +1,10 @@
 use std::{thread, time};
 
-use sdl2::{event::Event, keyboard::Keycode};
+use sdl2::{event::Event, keyboard::Keycode, ttf};
 
 use rs_snake::{
     collision, gfx,
-    types::{Direction, SnakeEvent},
+    types::{self, Direction, SnakeEvent},
     world::{self, Gamestate},
 };
 
@@ -18,6 +18,10 @@ fn main() {
 
     let (mut canvas, mut event_pump) = gfx::init(CANVAS_WIDTH, CANVAS_HEIGHT);
     let mut game_state = Gamestate::new(ROWS, COLS);
+
+    // fonts. apparently i have to keep the ttf context on the stack, can't move it, etc
+    let ttf_context = ttf::init().unwrap();
+    let font = gfx::init_font(&ttf_context, types::FONT_PATH);
 
     thread::spawn(move || {});
 
@@ -49,6 +53,7 @@ fn main() {
 
         // display frame
         gfx::render_frame(&mut canvas, &game_state.grid, cell_width);
+        gfx::render_text(&font, &mut canvas, &format!("Score: {}", game_state.score));
         gfx::display_frame(&mut canvas);
 
         // update position of snake

@@ -1,4 +1,4 @@
-use sdl2::{rect::Rect, render::Canvas, video::Window, EventPump};
+use sdl2::{rect::Rect, render::Canvas, ttf, video::Window, EventPump};
 
 use crate::types::{self, Cell, Grid};
 
@@ -64,4 +64,37 @@ pub fn render_frame(renderer: &mut Canvas<Window>, grid: &[Vec<Cell>], cell_widt
 /// Move the draw buffer to the display (ie swap back buffer to front)
 pub fn display_frame(renderer: &mut Canvas<Window>) {
     renderer.present();
+}
+
+// lifetime specifiers from https://users.rust-lang.org/t/rust-sdl2-does-not-live-long-enought-fighting-the-borrow-checher/9464/8
+pub fn init_font<'a, 'b>(
+    ttf_context: &'a ttf::Sdl2TtfContext,
+    path: &'static str,
+) -> ttf::Font<'a, 'b> {
+    let font = ttf_context.load_font(path, types::FONT_SIZE_SM).unwrap();
+    font
+}
+
+pub fn render_text(font: &ttf::Font, renderer: &mut Canvas<Window>, text: &str) {
+    let surface = font.render(text).blended(types::TEXT_COLOR).unwrap();
+    let width = surface.width();
+    let height = surface.height();
+
+    let (window_width, _) = renderer.window().size();
+    let text_x = window_width / 2;
+    let text_y = height / 2 + 5;
+    let text_center = (text_x as i32, text_y as i32);
+
+    let texture_creator = renderer.texture_creator();
+    let texture = texture_creator
+        .create_texture_from_surface(surface)
+        .unwrap();
+
+    renderer
+        .copy(
+            &texture,
+            None,
+            Rect::from_center(text_center, width, height),
+        )
+        .unwrap();
 }
