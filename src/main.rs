@@ -1,10 +1,11 @@
 use std::{thread, time};
 
-use sdl2::{event::Event, keyboard::Keycode, ttf};
+use sdl2::{event::Event, keyboard::Keycode, render::Canvas, ttf, video::Window};
 
 use rs_snake::{
     collision, gfx,
-    types::{self, Direction, SnakeEvent},
+    menu::{self, MenuEvent},
+    types::{self, Direction, GameMode, SnakeEvent},
     world::{self, Gamestate},
 };
 
@@ -12,16 +13,52 @@ fn main() {
     const CANVAS_WIDTH: u32 = 720_u32;
     const CANVAS_HEIGHT: u32 = CANVAS_WIDTH;
     const ROWS: u32 = 36;
-    const COLS: u32 = ROWS;
+    // const COLS: u32 = ROWS;
 
     let cell_width = CANVAS_WIDTH / ROWS;
 
     let (mut canvas, mut event_pump) = gfx::init(CANVAS_WIDTH, CANVAS_HEIGHT);
-    let mut game_state = Gamestate::new(ROWS, COLS);
 
     // fonts. apparently i have to keep the ttf context on the stack, can't move it, etc
     let ttf_context = ttf::init().unwrap();
-    let font = gfx::init_font(&ttf_context, types::FONT_PATH);
+    let menu_font = gfx::init_font(&ttf_context, types::FONT_PATH, types::FONT_SIZE_MD);
+    let game_font = gfx::init_font(&ttf_context, types::FONT_PATH, types::FONT_SIZE_SM);
+
+    'menu: loop {
+        // while let Some(evt) = menu::menu(&mut canvas, &mut event_pump, &menu_font) {
+        match menu::menu(&mut canvas, &mut event_pump, &menu_font) {
+            MenuEvent::Start(GameMode::Normal) => {
+                run_game(&mut canvas, &mut event_pump, &game_font, cell_width)
+            }
+            MenuEvent::Start(GameMode::Tal) => {
+                run_game(&mut canvas, &mut event_pump, &game_font, cell_width)
+            }
+            MenuEvent::Quit => break 'menu,
+        }
+    }
+}
+
+/// Maps keycodes to player movement direction
+// TODO: maybe just use an actual Map?
+fn map_key_input(keycode: Keycode) -> Option<SnakeEvent> {
+    match keycode {
+        Keycode::Up | Keycode::W => Some(SnakeEvent::Input(Direction::Up)),
+        Keycode::Left | Keycode::A => Some(SnakeEvent::Input(Direction::Left)),
+        Keycode::Right | Keycode::D => Some(SnakeEvent::Input(Direction::Right)),
+        Keycode::Down | Keycode::S => Some(SnakeEvent::Input(Direction::Down)),
+        _ => None,
+    }
+}
+
+fn run_game(
+    canvas: &mut Canvas<Window>,
+    event_pump: &mut sdl2::EventPump,
+    font: &ttf::Font,
+    cell_width: u32,
+) {
+    const ROWS: u32 = 36;
+    const COLS: u32 = ROWS;
+    let mut game_state = Gamestate::new(ROWS, COLS);
 
     thread::spawn(move || {});
 
@@ -52,27 +89,20 @@ fn main() {
         game_state.grid = game_state.food.render(game_state.grid);
 
         // display frame
-        gfx::render_frame(&mut canvas, &game_state.grid, cell_width);
-        gfx::render_text(&font, &mut canvas, &format!("Score: {}", game_state.score));
-        gfx::display_frame(&mut canvas);
+        gfx::render_frame(canvas, &game_state.grid, cell_width);
+        gfx::render_text(font, canvas, &format!("Score: {}", game_state.score));
+        gfx::display_frame(canvas);
 
         // update position of snake
         let evt =
             collision::collision_check(&game_state.grid, &game_state.player, &game_state.direction);
+        if let Some(SnakeEvent::Death) = evt {
+            game_state.handle_collision(evt);
+            thread::sleep(time::Duration::from_millis(800));
+            break 'game;
+        }
         game_state.handle_collision(evt);
 
         thread::sleep(time::Duration::from_millis(200));
-    }
-}
-
-/// Maps keycodes to player movement direction
-// TODO: maybe just use an actual Map?
-fn map_key_input(keycode: Keycode) -> Option<SnakeEvent> {
-    match keycode {
-        Keycode::Up | Keycode::W => Some(SnakeEvent::Input(Direction::Up)),
-        Keycode::Left | Keycode::A => Some(SnakeEvent::Input(Direction::Left)),
-        Keycode::Right | Keycode::D => Some(SnakeEvent::Input(Direction::Right)),
-        Keycode::Down | Keycode::S => Some(SnakeEvent::Input(Direction::Down)),
-        _ => None,
     }
 }

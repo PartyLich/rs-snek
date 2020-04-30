@@ -16,8 +16,10 @@ pub const SNAKE_COLOR: Cell = Cell::RGB(141, 141, 139);
 pub const BG_COLOR: Cell = Cell::RGB(42, 42, 42);
 
 pub const TEXT_COLOR: Cell = Cell::RGB(225, 225, 225);
+pub const TEXT_SELECTED: Cell = FOOD_COLOR;
 pub const FONT_PATH: &str = "./resource/NotoSans-Regular.ttf";
 pub const FONT_SIZE_SM: u16 = 12;
+pub const FONT_SIZE_MD: u16 = 18;
 
 /// Valid directions of travel
 #[derive(Debug, PartialEq)]
@@ -59,6 +61,13 @@ pub enum SnakeEvent {
     Death,
     /// Player input/control event
     Input(Direction),
+}
+
+/// Available modes of play
+#[derive(Debug, PartialEq, Clone)]
+pub enum GameMode {
+    Normal,
+    Tal,
 }
 
 #[cfg(test)]
