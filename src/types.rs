@@ -15,6 +15,10 @@ pub const FOOD_COLOR: Cell = Cell::RGB(188, 13, 36);
 pub const SNAKE_COLOR: Cell = Cell::RGB(141, 141, 139);
 pub const BG_COLOR: Cell = Cell::RGB(42, 42, 42);
 
+pub const TEXT_COLOR: Cell = Cell::RGB(225, 225, 225);
+pub const FONT_PATH: &str = "./resource/NotoSans-Regular.ttf";
+pub const FONT_SIZE_SM: u16 = 12;
+
 /// Valid directions of travel
 #[derive(Debug, PartialEq)]
 pub enum Direction {
