@@ -57,7 +57,6 @@ impl Gamestate {
                 println!("event: {:?}", evt);
                 // game over. restart
                 println!("\n\tGAME OVER. restarting\n");
-                *self = Gamestate::new(cols, rows);
             }
             Some(SnakeEvent::Food) => {
                 println!("event: {:?}", evt);
