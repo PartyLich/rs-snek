@@ -76,8 +76,7 @@ pub fn init_font<'a, 'b>(
     path: &'static str,
     size: u16,
 ) -> ttf::Font<'a, 'b> {
-    let font = ttf_context.load_font(path, size).unwrap();
-    font
+    ttf_context.load_font(path, size).unwrap()
 }
 
 /// Display a text `&str` at the top center of the window
