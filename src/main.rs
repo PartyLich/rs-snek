@@ -25,14 +25,14 @@ fn main() {
     let game_font = gfx::init_font(&ttf_context, types::FONT_PATH, types::FONT_SIZE_SM);
 
     'menu: loop {
-        // while let Some(evt) = menu::menu(&mut canvas, &mut event_pump, &menu_font) {
         match menu::menu(&mut canvas, &mut event_pump, &menu_font) {
-            MenuEvent::Start(GameMode::Normal) => {
-                run_game(&mut canvas, &mut event_pump, &game_font, cell_width)
-            }
-            MenuEvent::Start(GameMode::Tal) => {
-                run_game(&mut canvas, &mut event_pump, &game_font, cell_width)
-            }
+            MenuEvent::Start(game_mode) => run_game(
+                &mut canvas,
+                &mut event_pump,
+                &game_font,
+                cell_width,
+                game_mode,
+            ),
             MenuEvent::Quit => break 'menu,
         }
     }
@@ -55,10 +55,11 @@ fn run_game(
     event_pump: &mut sdl2::EventPump,
     font: &ttf::Font,
     cell_width: u32,
+    game_mode: GameMode,
 ) {
     const ROWS: u32 = 36;
     const COLS: u32 = ROWS;
-    let mut game_state = Gamestate::new(ROWS, COLS);
+    let mut game_state = Gamestate::new(ROWS, COLS, game_mode);
 
     thread::spawn(move || {});
 

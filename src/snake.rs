@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-use crate::types::{Cell, Direction, Grid, SNAKE_COLOR};
+use crate::types::{Cell, Direction, GameMode, Grid, SNAKE_COLOR};
 
 pub type Position = (u32, u32);
 
@@ -12,19 +12,27 @@ pub struct Snake {
 
     /// List of positions that comprise the Snake's body
     pub body: VecDeque<Position>,
+
+    /// Current game mode, which affects Snake behavior
+    mode: GameMode,
 }
 
 impl Snake {
     /// Creates a new instance of `Snake`
-    pub fn new(row: u32, col: u32, mut cell: Option<Cell>) -> Self {
+    pub fn new(row: u32, col: u32, mut cell: Option<Cell>, mut mode: Option<GameMode>) -> Self {
         if cell.is_none() {
             cell = Some(SNAKE_COLOR);
         }
+        if mode.is_none() {
+            mode = Some(GameMode::Normal);
+        }
+
         let mut body = VecDeque::new();
         body.push_front((row, col));
 
         Self {
             cell: cell.unwrap(),
+            mode: mode.unwrap(),
             body,
         }
     }
@@ -44,9 +52,15 @@ impl Snake {
         // boundary checks
         if let Some(y) = wrap_index(0, height, row) {
             row = y;
+            if self.mode == GameMode::Tal {
+                col = mirror_index(0, width, col);
+            }
         }
         if let Some(x) = wrap_index(0, width, col) {
             col = x;
+            if self.mode == GameMode::Tal {
+                row = mirror_index(0, height, row);
+            }
         }
 
         // dont let snake turn back on itself
@@ -95,6 +109,12 @@ fn wrap_index(lower: i32, upper: i32, i: i32) -> Option<i32> {
     }
 }
 
+/// mirror an index across the middle of the range  `lower` (inclusive) and `upper` (exclusive)
+fn mirror_index(lower: i32, upper: i32, i: i32) -> i32 {
+    let offset = (upper - 1) - i;
+    lower + offset
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -103,28 +123,28 @@ mod tests {
     fn snake_renders() {
         let grid = vec![vec![Cell::RGB(0, 0, 0)]];
         let expected = vec![vec![SNAKE_COLOR]];
-        let actual = Snake::new(0, 0, None).render(grid);
+        let actual = Snake::new(0, 0, None, None).render(grid);
         assert_eq!(actual, expected);
     }
 
     #[test]
     fn snake_default_color() {
         let expected = SNAKE_COLOR;
-        let actual = Snake::new(0, 0, None).cell;
+        let actual = Snake::new(0, 0, None, None).cell;
         assert_eq!(actual, expected);
     }
 
     #[test]
     fn snake_specified_color() {
         let expected = Cell::RGB(1, 2, 2);
-        let actual = Snake::new(0, 0, Some(Cell::RGB(1, 2, 2))).cell;
+        let actual = Snake::new(0, 0, Some(Cell::RGB(1, 2, 2)), None).cell;
         assert_eq!(actual, expected);
     }
 
     #[test]
     fn snake_position() {
         let expected = (10, 20);
-        let actual = *Snake::new(10, 20, None).position();
+        let actual = *Snake::new(10, 20, None, None).position();
         assert_eq!(actual, expected);
     }
 
@@ -139,6 +159,13 @@ mod tests {
     fn wraps_index_lower() {
         let expected = Some(9);
         let actual = wrap_index(0, 10, -5);
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn mirrors_index() {
+        let expected = 1;
+        let actual = mirror_index(0, 4, 2);
         assert_eq!(actual, expected);
     }
 }
