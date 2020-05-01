@@ -3,9 +3,9 @@ use std::{thread, time};
 use sdl2::{event::Event, keyboard::Keycode, render::Canvas, ttf, video::Window};
 
 use rs_snake::{
-    collision, gfx,
+    collision, gfx, input,
     menu::{self, MenuEvent},
-    types::{self, Direction, GameMode, SnakeEvent},
+    types::{self, GameMode, SnakeEvent},
     world::{self, Gamestate},
 };
 
@@ -38,18 +38,6 @@ fn main() {
     }
 }
 
-/// Maps keycodes to player movement direction
-// TODO: maybe just use an actual Map?
-fn map_key_input(keycode: Keycode) -> Option<SnakeEvent> {
-    match keycode {
-        Keycode::Up | Keycode::W => Some(SnakeEvent::Input(Direction::Up)),
-        Keycode::Left | Keycode::A => Some(SnakeEvent::Input(Direction::Left)),
-        Keycode::Right | Keycode::D => Some(SnakeEvent::Input(Direction::Right)),
-        Keycode::Down | Keycode::S => Some(SnakeEvent::Input(Direction::Down)),
-        _ => None,
-    }
-}
-
 fn run_game(
     canvas: &mut Canvas<Window>,
     event_pump: &mut sdl2::EventPump,
@@ -76,7 +64,7 @@ fn run_game(
                 // movement keys
                 Event::KeyDown {
                     keycode: Some(k), ..
-                } => game_state.handle_input(map_key_input(k)),
+                } => game_state.handle_input(input::map_key_input(k)),
 
                 _ => continue 'game,
             }
