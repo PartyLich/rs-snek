@@ -11,6 +11,7 @@ pub fn main_menu(
     let mut main_menu = Menu::new(vec![
         MenuItem::new("Normal Mode", MenuEvent::Start(GameMode::Normal)),
         MenuItem::new("Tal'ke Challenge", MenuEvent::Start(GameMode::Tal)),
+        MenuItem::new("Labyrinth Mode", MenuEvent::Start(GameMode::Map)),
         MenuItem::new("Quit", MenuEvent::Quit),
     ]);
 
