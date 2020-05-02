@@ -64,7 +64,7 @@ pub enum SnakeEvent {
 }
 
 /// Available modes of play
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum GameMode {
     Normal,
     Tal,
