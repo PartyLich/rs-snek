@@ -2,7 +2,7 @@ use sdl2::{rect::Rect, render::Canvas, ttf, video::Window, EventPump};
 
 use crate::{
     menu,
-    types::{self, Cell, Grid},
+    types::{self, Cell},
 };
 
 /// Initialize the canvas
