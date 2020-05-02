@@ -6,7 +6,7 @@ use rs_snake::{
     gfx, input,
     menu::{self, MenuEvent},
     types::{self, GameMode, SnakeEvent},
-    world::{self, Gamestate},
+    world::Gamestate,
 };
 
 fn main() {
@@ -69,7 +69,7 @@ fn run_game(
         }
 
         // fresh state for this game step
-        game_state.grid = world::grid_init(ROWS, ROWS);
+        game_state.grid = game_state.grid_init();
         // update grid with position of snake
         game_state.grid = game_state.player.render(game_state.grid);
         // update grid with position of food

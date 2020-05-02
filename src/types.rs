@@ -11,9 +11,13 @@ pub type Grid = Vec<Vec<Cell>>;
 /// The player's objective, an edible object that causes the player to grow
 pub type Food = crate::snake::Snake;
 
+/// A location on the 2dimensional gameboard
+pub type Position = (u32, u32);
+
 pub const FOOD_COLOR: Cell = Cell::RGB(188, 13, 36);
 pub const SNAKE_COLOR: Cell = Cell::RGB(141, 141, 139);
 pub const BG_COLOR: Cell = Cell::RGB(42, 42, 42);
+pub const WALL_COLOR: Cell = Cell::RGB(0, 102, 102);
 
 pub const TEXT_COLOR: Cell = Cell::RGB(225, 225, 225);
 pub const TEXT_SELECTED: Cell = FOOD_COLOR;
@@ -76,6 +80,16 @@ pub enum SnakeEvent {
 pub enum GameMode {
     Normal,
     Tal,
+    Map,
+}
+
+/// World map that lays out impassable terrain
+#[derive(Debug, PartialEq)]
+pub struct WorldMap {
+    /// List of wall `Position`s
+    pub walls: Vec<Position>,
+    /// Wall color
+    pub color: Cell,
 }
 
 #[cfg(test)]
