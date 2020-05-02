@@ -56,7 +56,7 @@ impl Gamestate {
         let mut row = rand::thread_rng().gen_range(0, self.grid.len());
         let mut col = rand::thread_rng().gen_range(0, self.grid[0].len());
 
-        while self.grid[row][col] == SNAKE_COLOR {
+        while self.grid[row][col] != types::BG_COLOR {
             row = rand::thread_rng().gen_range(0, self.grid.len());
             col = rand::thread_rng().gen_range(0, self.grid[0].len());
         }
