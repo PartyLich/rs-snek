@@ -50,8 +50,6 @@ fn run_game(
     let mut game_state = Gamestate::new(ROWS, COLS, game_mode);
     let mut paused = false;
 
-    thread::spawn(move || {});
-
     'game: loop {
         for event in event_pump.poll_iter() {
             match event {
