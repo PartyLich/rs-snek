@@ -1,7 +1,7 @@
 /// Provides collision detection functions
 use crate::{
     snake::Snake,
-    types::{Cell, Direction, SnakeEvent, FOOD_COLOR, SNAKE_COLOR},
+    types::{Cell, Direction, SnakeEvent, BG_COLOR, FOOD_COLOR},
 };
 
 /// Check for collisions in the player's *next* position and return appropriate `SnakeEvent`
@@ -13,9 +13,9 @@ pub fn collision_check(
     let (row, col) = player.next_position(direction, grid.len() as i32, grid[0].len() as i32);
 
     match grid[row as usize][col as usize] {
-        _x if _x == SNAKE_COLOR => Some(SnakeEvent::Death),
+        _x if _x == BG_COLOR => None,
         _x if _x == FOOD_COLOR => Some(SnakeEvent::Food),
-        _ => None,
+        _ => Some(SnakeEvent::Death),
     }
 }
 
@@ -34,7 +34,7 @@ mod tests {
 
     #[test]
     fn collision_death() {
-        let grid = vec![vec![Cell::RGB(0, 0, 0), SNAKE_COLOR]];
+        let grid = vec![vec![Cell::RGB(0, 0, 0), types::SNAKE_COLOR]];
         let expected = Some(SnakeEvent::Death);
         let actual = collision_check(&grid, &Snake::new(0, 0, None, None), &Direction::Left);
         assert_eq!(actual, expected);
