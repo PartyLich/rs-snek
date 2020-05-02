@@ -33,10 +33,12 @@ pub struct Gamestate {
     /// Simulation pause flag
     paused: bool,
 
+    /// Optional world map that lays out impassable terrain
     world_map: Option<WorldMap>,
 }
 
 impl Gamestate {
+    /// Create a new instance of GameState
     pub fn new(rows: u32, cols: u32, game_mode: GameMode) -> Self {
         let world_map = match game_mode {
             GameMode::Map => Some(Self::generate_map(rows, cols)),
