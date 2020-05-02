@@ -39,7 +39,7 @@ pub struct Gamestate {
 impl Gamestate {
     pub fn new(rows: u32, cols: u32, game_mode: GameMode) -> Self {
         Gamestate {
-            grid: grid_init(cols, rows),
+            grid: vec![],
             direction: Direction::Down,
             player: Snake::new(0, 0, None, Some(game_mode)),
             food: Food::new(rows / 2, cols / 2, Some(FOOD_COLOR), None),
@@ -132,24 +132,25 @@ impl Gamestate {
         self.game_speed
     }
 
+    /// Initialize grid
+    ///
+    /// Creates a width x height vector of `Cells`
+    pub fn grid_init(&self) -> Grid {
+        let (height, width) = self.world_size;
+        let mut grid_vector = Vec::with_capacity(height as usize);
+
+        for row in 0..height as usize {
+            grid_vector.push(Vec::new());
+            for _col in 0..width {
+                grid_vector[row].push(types::BG_COLOR);
+            }
+        }
+
+        grid_vector
+    }
+
     /// Toggle the pause state
     fn toggle_pause(&mut self) {
         self.paused = !self.paused
     }
-}
-
-/// Initialize grid
-///
-/// Creates a width x height vector of `Cells`
-pub fn grid_init(width: u32, height: u32) -> Grid {
-    let mut grid_vector = Vec::with_capacity(height as usize);
-
-    for row in 0..height as usize {
-        grid_vector.push(Vec::new());
-        for _col in 0..width {
-            grid_vector[row].push(types::BG_COLOR);
-        }
-    }
-
-    grid_vector
 }
