@@ -24,6 +24,9 @@ pub struct Gamestate {
     /// The player's score
     pub score: usize,
 
+    /// The current ruleset
+    game_mode: GameMode,
+
     /// Delay between gamestate updates. The simulation speed
     game_speed: u64,
 
@@ -32,14 +35,15 @@ pub struct Gamestate {
 }
 
 impl Gamestate {
-    pub fn new(rows: u32, cols: u32, mode: GameMode) -> Self {
+    pub fn new(rows: u32, cols: u32, game_mode: GameMode) -> Self {
         Gamestate {
             grid: grid_init(cols, rows),
             direction: Direction::Down,
-            player: Snake::new(0, 0, None, Some(mode)),
+            player: Snake::new(0, 0, None, Some(game_mode)),
             food: Food::new(rows / 2, cols / 2, Some(FOOD_COLOR), None),
             world_size: (rows, cols),
             score: 0,
+            game_mode,
             game_speed: 200,
             paused: false,
         }
@@ -99,6 +103,11 @@ impl Gamestate {
             Some(SnakeEvent::Death) => {
                 self.handle_collision(&evt);
                 return evt;
+            }
+            Some(SnakeEvent::Food) => {
+                if self.game_mode == GameMode::Tal {
+                    self.game_speed = std::cmp::max(1, self.game_speed - 2);
+                }
             }
             _ => {}
         }
