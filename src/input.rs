@@ -1,6 +1,6 @@
 use sdl2::keyboard::Keycode;
 
-use crate::types::{Direction, SnakeEvent};
+use crate::types::{Direction, GameEvent, SnakeEvent};
 
 /// Maps keycodes to player movement direction
 // TODO: maybe just use an actual Map?
@@ -10,6 +10,7 @@ pub fn map_key_input(keycode: Keycode) -> Option<SnakeEvent> {
         Keycode::Left | Keycode::A => Some(SnakeEvent::Input(Direction::Left)),
         Keycode::Right | Keycode::D => Some(SnakeEvent::Input(Direction::Right)),
         Keycode::Down | Keycode::S => Some(SnakeEvent::Input(Direction::Down)),
+        Keycode::P => Some(SnakeEvent::Game(GameEvent::Pause)),
         _ => None,
     }
 }

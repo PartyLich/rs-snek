@@ -3,7 +3,9 @@ use rand::Rng;
 use crate::{
     collision,
     snake::Snake,
-    types::{self, Direction, Food, GameMode, Grid, SnakeEvent, FOOD_COLOR, SNAKE_COLOR},
+    types::{
+        self, Direction, Food, GameEvent, GameMode, Grid, SnakeEvent, FOOD_COLOR, SNAKE_COLOR,
+    },
 };
 
 /// The state of the gameworld
@@ -87,8 +89,14 @@ impl Gamestate {
 
     /// Change player movement direction according to input event
     pub fn handle_input(&mut self, input: Option<types::SnakeEvent>) {
-        if let Some(SnakeEvent::Input(d)) = input {
-            self.direction = d;
+        match input {
+            Some(SnakeEvent::Input(d)) => {
+                self.direction = d;
+            }
+            Some(SnakeEvent::Game(GameEvent::Pause)) => {
+                self.toggle_pause();
+            }
+            _ => (),
         }
     }
 
@@ -125,7 +133,7 @@ impl Gamestate {
     }
 
     /// Toggle the pause state
-    pub fn toggle_pause(&mut self) {
+    fn toggle_pause(&mut self) {
         self.paused = !self.paused
     }
 }

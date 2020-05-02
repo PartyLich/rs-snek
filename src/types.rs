@@ -52,6 +52,12 @@ impl Direction {
     }
 }
 
+#[derive(Debug, PartialEq)]
+pub enum GameEvent {
+    Pause,
+    Menu,
+}
+
 /// Events that may affect the player
 #[derive(Debug, PartialEq)]
 pub enum SnakeEvent {
@@ -61,6 +67,8 @@ pub enum SnakeEvent {
     Death,
     /// Player input/control event
     Input(Direction),
+    ///
+    Game(GameEvent),
 }
 
 /// Available modes of play

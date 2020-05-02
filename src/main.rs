@@ -59,16 +59,7 @@ fn run_game(
                     ..
                 } => break 'game,
 
-                // pause on P key
-                Event::KeyDown {
-                    keycode: Some(Keycode::P),
-                    ..
-                } => {
-                    game_state.toggle_pause();
-                    continue 'game;
-                }
-
-                // movement keys
+                // user input keys
                 Event::KeyDown {
                     keycode: Some(k), ..
                 } => game_state.handle_input(input::map_key_input(k)),
