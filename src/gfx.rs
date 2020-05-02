@@ -15,13 +15,15 @@ pub fn init(width: u32, height: u32) -> (Canvas<Window>, EventPump) {
         .position_centered()
         .build()
         .expect("Failed to build window");
+    let canvas = window
+        .into_canvas()
+        .present_vsync()
+        .build()
+        .expect("Failed to get canvas from window");
+    let event_pump = sdl_context
+        .event_pump()
+        .expect("Failed to get SDL2 event pump");
 
-    let mut canvas = window.into_canvas().present_vsync().build().unwrap();
-
-    clear_frame(&mut canvas);
-    display_frame(&mut canvas);
-
-    let event_pump = sdl_context.event_pump().unwrap();
     (canvas, event_pump)
 }
 
