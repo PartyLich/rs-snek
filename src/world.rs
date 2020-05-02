@@ -1,6 +1,7 @@
 use rand::Rng;
 
 use crate::{
+    collision,
     snake::Snake,
     types::{self, Direction, Food, GameMode, Grid, SnakeEvent, FOOD_COLOR, SNAKE_COLOR},
 };
@@ -22,6 +23,12 @@ pub struct Gamestate {
 
     /// The player's score
     pub score: usize,
+
+    /// Delay between gamestate updates. The simulation speed
+    game_speed: u64,
+
+    /// Simulation pause flag
+    paused: bool,
 }
 
 impl Gamestate {
@@ -33,6 +40,8 @@ impl Gamestate {
             food: Food::new(rows / 2, cols / 2, Some(FOOD_COLOR), None),
             world_size: (rows, cols),
             score: 0,
+            game_speed: 200,
+            paused: false,
         }
     }
 
@@ -50,7 +59,7 @@ impl Gamestate {
     }
 
     /// Transition game state due to  player collision events
-    pub fn handle_collision(&mut self, evt: Option<SnakeEvent>) {
+    pub fn handle_collision(&mut self, evt: &Option<SnakeEvent>) {
         let (rows, cols) = self.world_size;
         match evt {
             Some(evt @ SnakeEvent::Death) => {
@@ -77,6 +86,38 @@ impl Gamestate {
         if let Some(SnakeEvent::Input(d)) = input {
             self.direction = d;
         }
+    }
+
+    /// Updates the world state
+    pub fn simulate(&mut self, dt: usize) -> Option<types::SnakeEvent> {
+        if self.paused {
+            return None;
+        }
+
+        let evt = collision::collision_check(&self.grid, &self.player, &self.direction);
+        match evt {
+            Some(SnakeEvent::Death) => {
+                self.handle_collision(&evt);
+                return evt;
+            }
+            _ => {}
+        }
+        self.handle_collision(&evt);
+
+        None
+    }
+
+    /// Returns the simulation speed
+    pub fn speed(&self) -> u64 {
+        if self.paused {
+            return 0;
+        }
+        self.game_speed
+    }
+
+    /// Toggle the pause state
+    pub fn toggle_pause(&mut self) {
+        self.paused = !self.paused
     }
 }
 

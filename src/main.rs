@@ -3,7 +3,7 @@ use std::{thread, time};
 use sdl2::{event::Event, keyboard::Keycode, render::Canvas, ttf, video::Window};
 
 use rs_snake::{
-    collision, gfx, input,
+    gfx, input,
     menu::{self, MenuEvent},
     types::{self, GameMode, SnakeEvent},
     world::{self, Gamestate},
@@ -48,7 +48,6 @@ fn run_game(
     const ROWS: u32 = 36;
     const COLS: u32 = ROWS;
     let mut game_state = Gamestate::new(ROWS, COLS, game_mode);
-    let mut paused = false;
 
     'game: loop {
         for event in event_pump.poll_iter() {
@@ -64,7 +63,10 @@ fn run_game(
                 Event::KeyDown {
                     keycode: Some(Keycode::P),
                     ..
-                } => paused = !paused,
+                } => {
+                    game_state.toggle_pause();
+                    continue 'game;
+                }
 
                 // movement keys
                 Event::KeyDown {
@@ -73,10 +75,6 @@ fn run_game(
 
                 _ => continue 'game,
             }
-        }
-
-        if paused {
-            continue 'game;
         }
 
         // fresh state for this game step
@@ -91,16 +89,12 @@ fn run_game(
         gfx::render_text(font, canvas, &format!("Score: {}", game_state.score));
         gfx::display_frame(canvas);
 
-        // update position of snake
-        let evt =
-            collision::collision_check(&game_state.grid, &game_state.player, &game_state.direction);
-        if let Some(SnakeEvent::Death) = evt {
-            game_state.handle_collision(evt);
+        // update world state
+        if let Some(SnakeEvent::Death) = game_state.simulate(1) {
             thread::sleep(time::Duration::from_millis(800));
             break 'game;
         }
-        game_state.handle_collision(evt);
 
-        thread::sleep(time::Duration::from_millis(200));
+        thread::sleep(time::Duration::from_millis(game_state.speed()));
     }
 }
