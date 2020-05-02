@@ -48,6 +48,7 @@ fn run_game(
     const ROWS: u32 = 36;
     const COLS: u32 = ROWS;
     let mut game_state = Gamestate::new(ROWS, COLS, game_mode);
+    let mut paused = false;
 
     thread::spawn(move || {});
 
@@ -61,6 +62,12 @@ fn run_game(
                     ..
                 } => break 'game,
 
+                // pause on P key
+                Event::KeyDown {
+                    keycode: Some(Keycode::P),
+                    ..
+                } => paused = !paused,
+
                 // movement keys
                 Event::KeyDown {
                     keycode: Some(k), ..
@@ -68,6 +75,10 @@ fn run_game(
 
                 _ => continue 'game,
             }
+        }
+
+        if paused {
+            continue 'game;
         }
 
         // fresh state for this game step
