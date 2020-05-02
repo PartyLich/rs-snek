@@ -1,8 +1,6 @@
 use std::collections::VecDeque;
 
-use crate::types::{Cell, Direction, GameMode, Grid, SNAKE_COLOR};
-
-pub type Position = (u32, u32);
+use crate::types::{Cell, Direction, GameMode, Grid, Position, SNAKE_COLOR};
 
 /// Snake represents the player.
 #[derive(Debug)]

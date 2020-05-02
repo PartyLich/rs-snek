@@ -11,6 +11,8 @@ pub type Grid = Vec<Vec<Cell>>;
 /// The player's objective, an edible object that causes the player to grow
 pub type Food = crate::snake::Snake;
 
+pub type Position = (u32, u32);
+
 pub const FOOD_COLOR: Cell = Cell::RGB(188, 13, 36);
 pub const SNAKE_COLOR: Cell = Cell::RGB(141, 141, 139);
 pub const BG_COLOR: Cell = Cell::RGB(42, 42, 42);
