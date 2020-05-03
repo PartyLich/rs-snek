@@ -1,5 +1,8 @@
 use sdl2::pixels::Color;
 
+mod direction;
+pub use direction::Direction;
+
 pub const GAME_NAME: &str = "rs-snek";
 
 /// A single square on the game board
@@ -19,43 +22,14 @@ pub const SNAKE_COLOR: Cell = Cell::RGB(141, 141, 139);
 pub const BG_COLOR: Cell = Cell::RGB(42, 42, 42);
 pub const WALL_COLOR: Cell = Cell::RGB(0, 102, 102);
 pub const EVIL_COLOR: Cell = Cell::RGB(255 - 141, 255 - 141, 255 - 139);
+// Rgba([max - rgba[0], max - rgba[1], max - rgba[2], rgba[3]])
 
 pub const TEXT_COLOR: Cell = Cell::RGB(225, 225, 225);
 pub const TEXT_SELECTED: Cell = FOOD_COLOR;
 pub const FONT_PATH: &str = "./resource/NotoSans-Regular.ttf";
+// pub const FONT_PATH: &str = std::path::Path::new("../resource/NotoSans-Regular.ttf").to_str().unwrap();
 pub const FONT_SIZE_SM: u16 = 12;
 pub const FONT_SIZE_MD: u16 = 18;
-
-/// Valid directions of travel
-#[derive(Debug, PartialEq)]
-pub enum Direction {
-    Left,
-    Right,
-    Up,
-    Down,
-}
-
-impl Direction {
-    /// Returns a tuple of `(row, col)` values representing change in position for a `Direction`
-    pub fn value(&self) -> (i32, i32) {
-        match *self {
-            Self::Left => (0, -1),
-            Self::Right => (0, 1),
-            Self::Up => (-1, 0),
-            Self::Down => (1, 0),
-        }
-    }
-
-    /// Returns the `Direction` opposite (180 degrees) this `Direction`
-    pub fn flip(&self) -> Self {
-        match *self {
-            Self::Left => Self::Right,
-            Self::Right => Self::Left,
-            Self::Up => Self::Down,
-            Self::Down => Self::Up,
-        }
-    }
-}
 
 #[derive(Debug, PartialEq)]
 pub enum GameEvent {
@@ -95,13 +69,5 @@ pub struct WorldMap {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-
-    #[test]
-    fn direction_flip() {
-        assert_eq!(Direction::Down.flip(), Direction::Up);
-        assert_eq!(Direction::Up.flip(), Direction::Down);
-        assert_eq!(Direction::Right.flip(), Direction::Left);
-        assert_eq!(Direction::Left.flip(), Direction::Right);
-    }
+    // use super::*;
 }
