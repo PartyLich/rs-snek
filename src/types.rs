@@ -1,7 +1,10 @@
 use sdl2::pixels::Color;
 
 mod direction;
+mod worldmap;
+
 pub use direction::Direction;
+pub use worldmap::WorldMap;
 
 pub const GAME_NAME: &str = "rs-snek";
 
@@ -56,15 +59,6 @@ pub enum GameMode {
     Normal,
     Tal,
     Map,
-}
-
-/// World map that lays out impassable terrain
-#[derive(Debug, PartialEq)]
-pub struct WorldMap {
-    /// List of wall `Position`s
-    pub walls: Vec<Position>,
-    /// Wall color
-    pub color: Cell,
 }
 
 #[cfg(test)]
