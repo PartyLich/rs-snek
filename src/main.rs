@@ -47,7 +47,11 @@ fn run_game(
 ) {
     const ROWS: u32 = 36;
     const COLS: u32 = ROWS;
-    let mut game_state = Gamestate::new(ROWS, COLS, game_mode);
+    let mapper = Box::new(rs_snake::map::CsvMapper {});
+    let mut game_state = match game_mode {
+        GameMode::Map => Gamestate::new(ROWS, COLS, game_mode, Some(mapper)),
+        _ => Gamestate::new(ROWS, COLS, game_mode, None),
+    };
 
     'game: loop {
         for event in event_pump.poll_iter() {

@@ -2,6 +2,7 @@ use rand::Rng;
 
 use crate::{
     collision,
+    map::Mapper,
     snake::Snake,
     types::{self, Direction, Food, GameEvent, GameMode, Grid, SnakeEvent, WorldMap, FOOD_COLOR},
 };
@@ -42,9 +43,16 @@ pub struct Gamestate {
 
 impl Gamestate {
     /// Create a new instance of GameState
-    pub fn new(rows: u32, cols: u32, game_mode: GameMode) -> Self {
+    pub fn new(rows: u32, cols: u32, game_mode: GameMode, mapper: Option<Box<dyn Mapper>>) -> Self {
         let world_map = match game_mode {
-            GameMode::Map => Some(Self::generate_map(rows, cols)),
+            GameMode::Map => Some(
+                mapper
+                    .unwrap_or_else(|| {
+                        panic!("Mapper must be supplied when game mode is {:?}", game_mode)
+                    })
+                    .load_map()
+                    .unwrap_or_else(|e| panic!("Failed to load map: {}", e)),
+            ),
             _ => None,
         };
 
@@ -175,55 +183,5 @@ impl Gamestate {
     /// Toggle the pause state
     fn toggle_pause(&mut self) {
         self.paused = !self.paused
-    }
-
-    fn generate_map(_rows: u32, _cols: u32) -> WorldMap {
-        let walls = vec![
-            // top
-            (10, 12),
-            (11, 12),
-            (12, 12),
-            (13, 12),
-            (14, 12),
-            (14, 11),
-            (14, 10),
-            (14, 9),
-            (14, 8),
-            // top
-            (10, 24),
-            (11, 24),
-            (12, 24),
-            (13, 24),
-            (14, 24),
-            (14, 25),
-            (14, 26),
-            (14, 27),
-            (14, 28),
-            // bottom
-            (26, 24),
-            (25, 24),
-            (24, 24),
-            (23, 24),
-            (22, 24),
-            (22, 25),
-            (22, 26),
-            (22, 27),
-            (22, 28),
-            // bottom
-            (26, 12),
-            (25, 12),
-            (24, 12),
-            (23, 12),
-            (22, 12),
-            (22, 11),
-            (22, 10),
-            (22, 9),
-            (22, 8),
-        ];
-
-        WorldMap {
-            color: types::WALL_COLOR,
-            walls,
-        }
     }
 }
