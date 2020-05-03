@@ -18,6 +18,7 @@ pub const FOOD_COLOR: Cell = Cell::RGB(188, 13, 36);
 pub const SNAKE_COLOR: Cell = Cell::RGB(141, 141, 139);
 pub const BG_COLOR: Cell = Cell::RGB(42, 42, 42);
 pub const WALL_COLOR: Cell = Cell::RGB(0, 102, 102);
+pub const EVIL_COLOR: Cell = Cell::RGB(255 - 141, 255 - 141, 255 - 139);
 
 pub const TEXT_COLOR: Cell = Cell::RGB(225, 225, 225);
 pub const TEXT_SELECTED: Cell = FOOD_COLOR;

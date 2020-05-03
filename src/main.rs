@@ -72,6 +72,7 @@ fn run_game(
         game_state.grid = game_state.grid_init();
         // update grid with position of snake
         game_state.grid = game_state.player.render(game_state.grid);
+        game_state.grid = game_state.evil.render(game_state.grid);
         // update grid with position of food
         game_state.grid = game_state.food.render(game_state.grid);
 

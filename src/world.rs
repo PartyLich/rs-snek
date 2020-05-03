@@ -18,6 +18,9 @@ pub struct Gamestate {
     /// The player's avatar
     pub player: crate::snake::Snake,
 
+    /// A shadow of the player avatar. The player's passive nemesis
+    pub evil: crate::snake::Snake,
+
     /// The player's objective
     pub food: Food,
 
@@ -49,6 +52,7 @@ impl Gamestate {
             grid: vec![],
             direction: Direction::Down,
             player: Snake::new(0, 0, None, Some(game_mode)),
+            evil: Snake::new(35, 35, Some(types::EVIL_COLOR), Some(game_mode)),
             food: Food::new(rows / 2, cols / 2, Some(FOOD_COLOR), None),
             world_size: (rows, cols),
             score: 0,
@@ -85,11 +89,15 @@ impl Gamestate {
                 println!("event: {:?}", evt);
                 self.score += 1;
                 self.player.grow(&self.direction, cols as i32, rows as i32);
+                self.evil
+                    .grow(&self.direction.flip(), cols as i32, rows as i32);
                 self.fresh_food();
             }
             None => {
                 self.player
                     .update_position(&self.direction, cols as i32, rows as i32);
+                self.evil
+                    .update_position(&self.direction.flip(), cols as i32, rows as i32);
             }
             _ => (),
         }
