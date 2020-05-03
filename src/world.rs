@@ -64,7 +64,7 @@ impl Gamestate {
     }
 
     /// Create a new target object at a random location
-    pub fn fresh_food(&mut self) {
+    fn fresh_food(&mut self) {
         let mut row = rand::thread_rng().gen_range(0, self.grid.len());
         let mut col = rand::thread_rng().gen_range(0, self.grid[0].len());
 
@@ -77,7 +77,7 @@ impl Gamestate {
     }
 
     /// Transition game state due to  player collision events
-    pub fn handle_collision(&mut self, evt: &Option<SnakeEvent>) {
+    fn handle_collision(&mut self, evt: &Option<SnakeEvent>) {
         let (rows, cols) = self.world_size;
         match evt {
             Some(evt @ SnakeEvent::Death) => {
@@ -117,7 +117,7 @@ impl Gamestate {
     }
 
     /// Updates the world state
-    pub fn simulate(&mut self, dt: usize) -> Option<types::SnakeEvent> {
+    pub fn simulate(&mut self, _dt: usize) -> Option<types::SnakeEvent> {
         if self.paused {
             return None;
         }
