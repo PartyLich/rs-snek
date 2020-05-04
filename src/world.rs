@@ -131,9 +131,9 @@ impl Gamestate {
         }
 
         let evt = collision::collision_check(&self.grid, &self.player, &self.direction);
+        self.handle_collision(&evt);
         match evt {
             Some(SnakeEvent::Death) => {
-                self.handle_collision(&evt);
                 return evt;
             }
             Some(SnakeEvent::Food) => {
@@ -143,7 +143,6 @@ impl Gamestate {
             }
             _ => {}
         }
-        self.handle_collision(&evt);
 
         None
     }
