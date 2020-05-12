@@ -1,7 +1,7 @@
 use sdl2::{event::Event, keyboard::Keycode, render::Canvas, ttf, video::Window, EventPump};
 
 use super::*;
-use crate::{gfx, types::GameMode};
+use crate::{system::gfx, types::GameMode};
 
 pub fn main_menu(
     canvas: &mut Canvas<Window>,

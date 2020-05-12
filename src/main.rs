@@ -3,8 +3,8 @@ use std::{thread, time};
 use sdl2::{event::Event, keyboard::Keycode, render::Canvas, ttf, video::Window};
 
 use rs_snake::{
-    gfx, input,
     menu::{self, MenuEvent},
+    system::{gfx, input},
     types::{self, GameMode, SnakeEvent},
     world::Gamestate,
 };

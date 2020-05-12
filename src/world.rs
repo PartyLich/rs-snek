@@ -1,9 +1,9 @@
 use rand::Rng;
 
 use crate::{
-    collision,
     map::Mapper,
     snake::Snake,
+    system::collision,
     types::{self, Direction, Food, GameEvent, GameMode, Grid, SnakeEvent, WorldMap, FOOD_COLOR},
 };
 
