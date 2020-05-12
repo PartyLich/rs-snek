@@ -160,14 +160,7 @@ impl Gamestate {
     /// Creates a width x height vector of `Cells`
     pub fn grid_init(&self) -> Grid {
         let (height, width) = self.world_size;
-        let mut grid_vector = Vec::with_capacity(height as usize);
-
-        for row in 0..height as usize {
-            grid_vector.push(Vec::new());
-            for _col in 0..width {
-                grid_vector[row].push(types::BG_COLOR);
-            }
-        }
+        let mut grid_vector = vec![vec![types::BG_COLOR; width as usize]; height as usize];
 
         if self.game_mode == GameMode::Map {
             let world_map = self.world_map.as_ref().unwrap();
