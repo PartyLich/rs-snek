@@ -1,3 +1,4 @@
+pub mod component;
 pub mod map;
 pub mod menu;
 pub mod snake;
