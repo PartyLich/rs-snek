@@ -1,5 +1,5 @@
 /// Valid directions of travel
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub enum Direction {
     Left,
     Right,
@@ -9,8 +9,8 @@ pub enum Direction {
 
 impl Direction {
     /// Returns a tuple of `(row, col)` values representing change in position for a `Direction`
-    pub fn value(&self) -> (i32, i32) {
-        match *self {
+    pub fn value(self) -> (i32, i32) {
+        match self {
             Self::Left => (0, -1),
             Self::Right => (0, 1),
             Self::Up => (-1, 0),
@@ -19,8 +19,8 @@ impl Direction {
     }
 
     /// Returns the `Direction` opposite (180 degrees) this `Direction`
-    pub fn flip(&self) -> Self {
-        match *self {
+    pub fn flip(self) -> Self {
+        match self {
             Self::Left => Self::Right,
             Self::Right => Self::Left,
             Self::Up => Self::Down,
