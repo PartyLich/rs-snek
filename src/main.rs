@@ -66,7 +66,7 @@ fn run_game(
                 // user input keys
                 Event::KeyDown {
                     keycode: Some(k), ..
-                } => game_state.handle_input(input::map_key_input(k)),
+                } => input::handle_input(&mut game_state, k),
 
                 _ => continue 'game,
             }
@@ -75,10 +75,13 @@ fn run_game(
         // fresh state for this game step
         game_state.grid = game_state.grid_init();
         // update grid with position of snake
-        game_state.grid = game_state.player.render(game_state.grid);
-        game_state.grid = game_state.evil.render(game_state.grid);
+        let player = game_state.player;
+        let evil = game_state.evil;
+        let food = game_state.food;
+        gfx::render_entity(&mut game_state, player);
+        gfx::render_entity(&mut game_state, evil);
         // update grid with position of food
-        game_state.grid = game_state.food.render(game_state.grid);
+        gfx::render_entity(&mut game_state, food);
 
         // display frame
         gfx::render_frame(canvas, &game_state.grid, cell_width);

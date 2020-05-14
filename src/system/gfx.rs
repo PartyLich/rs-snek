@@ -2,7 +2,8 @@ use sdl2::{rect::Rect, render::Canvas, ttf, video::Window, EventPump};
 
 use crate::{
     menu,
-    types::{self, Cell},
+    types::{self, Cell, Entity},
+    world::Gamestate,
 };
 
 /// Initialize the canvas
@@ -150,4 +151,21 @@ pub fn render_menu_item(
     renderer
         .copy(&texture, None, Rect::from_center((x, y), width, height))
         .unwrap();
+}
+
+/// Update grid to display this `Snake`
+pub fn render_entity(state: &mut Gamestate, entity: Entity) {
+    // get entity data
+    let mesh_component = match state.mesh_components[entity as usize].as_ref() {
+        Some(m) => m,
+        _ => return,
+    };
+    let cell_component = match state.cell_components[entity as usize].as_ref() {
+        Some(c) => c,
+        _ => return,
+    };
+
+    for (row, col) in mesh_component.mesh.iter() {
+        state.grid[*row as usize][*col as usize] = cell_component.cell;
+    }
 }

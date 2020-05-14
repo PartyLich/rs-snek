@@ -1,11 +1,15 @@
+use std::collections::VecDeque;
+
 use rand::Rng;
 
 use crate::{
+    component::*,
     map::Mapper,
-    snake::Snake,
-    system::collision,
-    types::{self, Direction, Food, GameEvent, GameMode, Grid, SnakeEvent, WorldMap, FOOD_COLOR},
+    system::{self},
+    types::{self, Direction, Entity, GameMode, Grid, SnakeEvent, WorldMap},
 };
+
+type ComponentManager<T> = Vec<Option<T>>;
 
 /// The state of the gameworld
 #[derive(Debug)]
@@ -16,26 +20,34 @@ pub struct Gamestate {
     /// The player's direction of travel
     pub direction: Direction,
 
+    // Component managers
+    pub direction_components: ComponentManager<DirectionComponent>,
+    pub mesh_components: ComponentManager<MeshComponent>,
+    pub collider_components: ComponentManager<ColliderComponent>,
+    pub cell_components: ComponentManager<CellComponent>,
+    pub input_components: ComponentManager<InputComponent>,
+    pub mirror_components: ComponentManager<MirrorComponent>,
+
     /// The player's avatar
-    pub player: crate::snake::Snake,
+    pub player: Entity,
 
     /// A shadow of the player avatar. The player's passive nemesis
-    pub evil: crate::snake::Snake,
+    pub evil: Entity,
 
     /// The player's objective
-    pub food: Food,
+    pub food: Entity,
 
     /// The player's score
     pub score: usize,
 
     /// The current ruleset
-    game_mode: GameMode,
+    pub game_mode: GameMode,
 
     /// Delay between gamestate updates. The simulation speed
     game_speed: u64,
 
     /// Simulation pause flag
-    paused: bool,
+    pub paused: bool,
 
     /// Optional world map that lays out impassable terrain
     world_map: Option<WorldMap>,
@@ -56,19 +68,34 @@ impl Gamestate {
             _ => None,
         };
 
-        Gamestate {
+        let mut this = Gamestate {
             grid: vec![],
             direction: Direction::Down,
-            player: Snake::new(0, 0, None, Some(game_mode)),
-            evil: Snake::new(35, 35, Some(types::EVIL_COLOR), Some(game_mode)),
-            food: Food::new(rows / 2, cols / 2, Some(FOOD_COLOR), None),
+            // player: Snake::new(0, 0, None, Some(game_mode)),
+            // players: Vec::new(),
+            // evil: Snake::new(35, 35, Some(types::EVIL_COLOR), Some(game_mode)),
+            // food: Food::new(rows / 2, cols / 2, Some(FOOD_COLOR), None),
             world_size: (rows, cols),
             score: 0,
             game_mode,
             game_speed: 200,
             paused: false,
             world_map,
-        }
+
+            direction_components: Vec::new(),
+            mesh_components: Vec::new(),
+            collider_components: Vec::new(),
+            cell_components: Vec::new(),
+            input_components: Vec::new(),
+            mirror_components: Vec::new(),
+
+            player: 0,
+            evil: 0,
+            food: 0,
+        };
+        this.make_entities(rows, cols);
+
+        this
     }
 
     /// Create a new target object at a random location
@@ -80,13 +107,16 @@ impl Gamestate {
             row = rand::thread_rng().gen_range(0, self.grid.len());
             col = rand::thread_rng().gen_range(0, self.grid[0].len());
         }
+        self.mesh_components[self.food as usize].take();
 
-        self.food = Food::new(row as u32, col as u32, Some(FOOD_COLOR), None);
+        let mut new_pos = VecDeque::with_capacity(1);
+        new_pos.push_back((row as u32, col as u32));
+
+        self.mesh_components[self.food as usize] = Some(MeshComponent { mesh: new_pos });
     }
 
     /// Transition game state due to  player collision events
     fn handle_collision(&mut self, evt: &Option<SnakeEvent>) {
-        let (rows, cols) = self.world_size;
         match evt {
             Some(evt @ SnakeEvent::Death) => {
                 println!("event: {:?}", evt);
@@ -96,29 +126,13 @@ impl Gamestate {
             Some(SnakeEvent::Food) => {
                 println!("event: {:?}", evt);
                 self.score += 1;
-                self.player.grow(&self.direction, cols as i32, rows as i32);
-                self.evil
-                    .grow(&self.direction.flip(), cols as i32, rows as i32);
+                system::motion::grow(self, self.player).expect("Grow update failed");
+                system::motion::grow(self, self.evil).expect("Grow update failed");
                 self.fresh_food();
             }
             None => {
-                self.player
-                    .update_position(&self.direction, cols as i32, rows as i32);
-                self.evil
-                    .update_position(&self.direction.flip(), cols as i32, rows as i32);
-            }
-            _ => (),
-        }
-    }
-
-    /// Change player movement direction according to input event
-    pub fn handle_input(&mut self, input: Option<types::SnakeEvent>) {
-        match input {
-            Some(SnakeEvent::Input(d)) => {
-                self.direction = d;
-            }
-            Some(SnakeEvent::Game(GameEvent::Pause)) => {
-                self.toggle_pause();
+                system::motion::update_position(self, self.player).expect("Position update failed");
+                system::motion::update_position(self, self.evil).expect("Position update failed");
             }
             _ => (),
         }
@@ -130,7 +144,7 @@ impl Gamestate {
             return None;
         }
 
-        let evt = collision::collision_check(&self.grid, &self.player, &self.direction);
+        let evt = system::collision::collision_check(self, self.player);
         self.handle_collision(&evt);
         match evt {
             Some(SnakeEvent::Death) => {
@@ -141,7 +155,7 @@ impl Gamestate {
                     self.game_speed = std::cmp::max(1, self.game_speed - 2);
                 }
             }
-            _ => {}
+            _ => (),
         }
 
         None
@@ -173,7 +187,69 @@ impl Gamestate {
     }
 
     /// Toggle the pause state
-    fn toggle_pause(&mut self) {
+    pub fn toggle_pause(&mut self) {
         self.paused = !self.paused
+    }
+
+    fn create_entity(&mut self) -> Entity {
+        self.direction_components.push(None);
+        self.mesh_components.push(None);
+        self.collider_components.push(None);
+        self.cell_components.push(None);
+        self.input_components.push(None);
+        self.mirror_components.push(None);
+
+        (self.mesh_components.len() - 1) as Entity
+    }
+
+    /// Create a snake entity and its components
+    fn make_snake(
+        &mut self,
+        cell: types::Cell,
+        position: types::Position,
+        direction: types::Direction, // entity: Entity,
+    ) -> Entity {
+        let entity = self.create_entity();
+
+        // add components
+        self.cell_components[entity as usize] = Some(CellComponent { cell });
+        let mut mesh = VecDeque::new();
+        mesh.push_back(position);
+        self.mesh_components[entity as usize] = Some(MeshComponent { mesh });
+        self.direction_components[entity as usize] = Some(DirectionComponent { direction });
+
+        entity
+    }
+
+    fn make_food(&mut self, position: types::Position) -> Entity {
+        let entity = self.create_entity();
+
+        // add components
+        self.cell_components[entity as usize] = Some(CellComponent {
+            cell: types::FOOD_COLOR,
+        });
+        let mut mesh = VecDeque::new();
+        mesh.push_back(position);
+        self.mesh_components[entity as usize] = Some(MeshComponent { mesh });
+
+        entity
+    }
+
+    /// Create ALL the game entities. Fortunately there's only a few, so this very procedural biz is
+    /// tolerable I hope.
+    fn make_entities(&mut self, rows: u32, cols: u32) {
+        let direction = types::Direction::Down;
+
+        // player avatar
+        self.player = self.make_snake(types::SNAKE_COLOR, (0, 0), direction);
+        self.input_components[self.player as usize] = Some(InputComponent {});
+        self.collider_components[self.player as usize] = Some(ColliderComponent {});
+
+        // evil mirror snake
+        self.evil = self.make_snake(types::EVIL_COLOR, (35, 35), direction.flip());
+        self.mirror_components[self.evil as usize] = Some(MirrorComponent {});
+
+        // initial target
+        self.food = self.make_food((rows / 2, cols / 2));
     }
 }
