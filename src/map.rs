@@ -22,12 +22,7 @@ pub trait Mapper {
 
 /// Get list of files in directory with .csv extension
 fn get_csvs_from_dir(dir_path: &str) -> Vec<PathBuf> {
-    fs::read_dir(dir_path)
-        .unwrap_or_else(|e| panic!("Unable to read dir {}: {}", dir_path, e))
-        .filter(|entry| entry.is_ok())
-        .map(|entry| entry.unwrap().path())
-        .filter(|file_path| file_path.extension() == Some(&OsString::from("csv")))
-        .collect()
+    list_dir_with_ext("csv")(dir_path)
 }
 
 /// Returns a function that takes a directory and lists files with given extension
