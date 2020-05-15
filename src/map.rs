@@ -16,7 +16,7 @@ pub use mem_mapper::MemMapper;
 
 /// `WorldMap` loading interface
 pub trait Mapper {
-    /// Returns a result that may have a WorldMap instance loaded from...somewhere.
+    /// Returns a `Result` that may have a WorldMap instance loaded from...somewhere.
     fn load_map(&self) -> Result<WorldMap, Box<dyn Error>>;
 }
 

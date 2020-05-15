@@ -90,6 +90,7 @@ fn run_game(
 
         // update world state
         if let Some(SnakeEvent::Death) = game_state.simulate(1) {
+            // pause so the user can look at what they've done :(
             thread::sleep(time::Duration::from_millis(800));
             break 'game;
         }
